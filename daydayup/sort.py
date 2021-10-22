@@ -29,27 +29,27 @@ def quickSort(arr,left,right):
     return arr
 
 # 归并排序
-def merge(s1,s2):
-    i,j=0,0
-    res = []
-    while i<len(s1) and j<len(s2):
-        if s1[i]<=s2[j]:
-            res.append(s1[i])
-            i+=1
-        else:
-            res.append(s2[j])
-            j+=1
-    res+=s1[i:]
-    res+=s2[j:]
-    return res
-
 def mergeSort(arr):
     if len(arr)<2: return arr
     n = len(arr)
     mid = n//2
     s1 = mergeSort(arr[0:mid])
     s2 = mergeSort(arr[mid:n])
-    return merge(s1,s2)
+
+    i, j = 0, 0
+    res = []
+    while i < len(s1) and j < len(s2):
+        if s1[i] <= s2[j]:
+            res.append(s1[i])
+            i += 1
+        else:
+            res.append(s2[j])
+            j += 1
+    res += s1[i:]
+    res += s2[j:]
+    return res
+
+
 
 
 # 堆排序
