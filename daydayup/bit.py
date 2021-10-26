@@ -11,6 +11,8 @@ def singleNumber(arr,k):
             res += (1 << i)
     return res
 
+# 出现一次的两个数字
+# 分治+异或
 
 # 不用加减乘除做加法
 def add(num1,num2):
@@ -25,18 +27,29 @@ def add(num1,num2):
         res = ~(num1 ^ 0xffffffff)
     return res
 
+# 1出现的个数
 def NumberOf1( n):
-    if n == 0: return 0
     res = 0
-    for i in range(32):
-        print(n & 1)
+    if n < 0:
+        n = n & 0xffffffff #python中独有的，将负数转化为正数
+
+    while n:
+
         if n & 1 == 1:
             res += 1
-            n = n >> 1
+        n >>= 1
     return res
 
-res = NumberOf1(10)
-print(res)
+
+# 数值的整数次方
+# 暴力法 O（n）
+# 快速幂递归Olog（n）
+# 非递归Olog（n）
+
+
+
+# res = NumberOf1(10)
+# print(res)
 
 # A=[5,2,5,2,3,9,9,20,15,8,8]
 # k = 2
