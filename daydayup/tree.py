@@ -184,3 +184,26 @@ class Solution:
         if abs(l - r) > 1:
             return -1
         return max(l, r) + 1
+
+
+class Solution:
+    # 把二叉树打印成多行
+    # 返回二维列表[[1,2],[4,5]]
+    def Print(self, pRoot):
+        # write code here
+        if not pRoot: return []
+        q = [pRoot]
+        res = []
+        while q:
+            sz = len(q)
+            tmp = []
+            for i in range(sz):
+                node = q.pop(0)
+                tmp.append(node.val)
+                if node.left:
+                    q.append(node.left)
+                if node.right:
+                    q.append(node.right)
+            res.append(tmp)
+
+        return res
