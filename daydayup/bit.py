@@ -22,10 +22,10 @@ def add(num1,num2):
         num1 = res
         num2 = carry
     if num1 <= 0x7fffffff:
-        res = num1
+        num1 = num1
     else:
-        res = ~(num1 ^ 0xffffffff)
-    return res
+        num1 = ~(num1 ^ 0xffffffff)
+    return num1
 
 # 1出现的个数
 def NumberOf1( n):
@@ -34,17 +34,44 @@ def NumberOf1( n):
         n = n & 0xffffffff #python中独有的，将负数转化为正数
 
     while n:
-
-        if n & 1 == 1:
-            res += 1
-        n >>= 1
+        res+=1
+        n=n&(n-1)
     return res
 
 
 # 数值的整数次方
-# 暴力法 O（n）
 # 快速幂递归Olog（n）
+def Power(self, base, exponent):
+    # write code here
+    if exponent < 0:
+        base = 1 / base
+        exponent = -exponent
+    return self.selfPower(base, exponent)
+
+
+def selfPower(self, b, n):
+    if n == 0: return 1.0
+    res = self.selfPower(b, n // 2)
+    if n & 1:
+        return res * res * b
+    else:
+        return res * res
+
 # 非递归Olog（n）
+def Power(b, n):
+    # write code here
+    if n < 0:
+        b = 1 / b
+        n = -n
+    res=1
+    while n!=0:
+        if n&1==1:
+            res*=b
+        b *=b
+        n>>=1
+    return res
+
+
 
 
 
