@@ -30,7 +30,7 @@ for data_file in file_list:
     X_rnn = data_rnn  # (2400,128,32)
     y = label         # (2400,)
 
-    fold = 2
+    fold = 10
     count = 0
     test_accuracy_all_fold = np.zeros(shape=[0], dtype=float)
     mean_accuracy = 0
@@ -48,7 +48,7 @@ for data_file in file_list:
         split = np.array(list(set(indexes_list) ^ set(split_list))) # 测试集剩下的就是训练集的
         X_cnn_tr = X_cnn[split]  # 训练集数据
         X_rnn_tr = X_rnn[split]
-        y_tr = y[split] # 训练集标签
+        y_tr = y[split] # 训练集标签 # (1200,)
 
         print("count",count)
         print("train_x shape:", X_cnn_tr.shape)  # (2160,128,9,9)
@@ -78,28 +78,28 @@ for data_file in file_list:
             X_cnn_tr_ = X_cnn_tr[i]
             X_cnn_tr_ = X_cnn_tr_.reshape(X_cnn_tr.shape[1], 81)
             gcf = gcForest(shape_1X=[9, 9], window=6, tolerance=0.0, min_samples_mgs=20, min_samples_cascade=10)
-            X_cnn_tr_mgs_ = gcf.mg_scanning(X_cnn_tr_, y_tr)                    # 模型根据y_tr进行训练
-            X_cnn_tr_mgs = np.concatenate((X_cnn_tr_mgs, X_cnn_tr_mgs_), axis=1)    # concatenate
+            X_cnn_tr_mgs_ = gcf.mg_scanning(X_cnn_tr_, y_tr)   # (1200,16)                 # 模型根据y_tr进行训练
+            X_cnn_tr_mgs = np.concatenate((X_cnn_tr_mgs, X_cnn_tr_mgs_), axis=1)     # (1200,32) # concatenate
             #print('X_tr_mgs_.shape:', X_tr_mgs_.shape)
             X_cnn_te_ = X_cnn_te[i]
             X_cnn_te_ = X_cnn_te_.reshape(X_cnn_te.shape[1], 81)
             #print('X_te_mgs_.shape:', X_te_mgs_.shape)
             X_cnn_te_mgs_ = gcf.mg_scanning(X_cnn_te_)                         # 回调最后训练的随机森林模型
-            X_cnn_te_mgs = np.concatenate((X_cnn_te_mgs, X_cnn_te_mgs_), axis=1)
-        print('X_tr_mgs.shape:', X_cnn_tr_mgs.shape) # (1200, 2048)
-        print('X_te_mgs.shape:', X_cnn_te_mgs.shape) # (1200, 2048)
+            X_cnn_te_mgs = np.concatenate((X_cnn_te_mgs, X_cnn_te_mgs_), axis=1)  # (1200,32)
+        print('X_cnn_tr_mgs.shape:', X_cnn_tr_mgs.shape) # (1200, 2048)
+        print('X_cnn_te_mgs.shape:', X_cnn_te_mgs.shape) # (1200, 2048)
 
-        X_rnn_tr = X_rnn_tr.transpose(1, 0, 2)  # (128,2160,32)
-        X_rnn_te = X_rnn_te.transpose(1, 0, 2)  # (128,240,32)
+        X_rnn_tr = X_rnn_tr.transpose(1, 0, 2)  # (128,1200,32)
+        X_rnn_te = X_rnn_te.transpose(1, 0, 2)  # (128,1200,32)
 
-        X_rnn_tr_ = X_rnn_tr[0]  # 初始化：第一个(2160, 32)数据
+        X_rnn_tr_ = X_rnn_tr[0]  # 初始化：第一个(1200, 32)数据
         # X_cnn_tr_ = X_cnn_tr_.reshape(X_cnn_tr.shape[1], 81)  # (2160, 9, 9) reshape-->(2160,81)
-        gcf = gcForest(shape_1X=32, window=4, tolerance=0.0, min_samples_mgs=20, min_samples_cascade=10)
-        X_rnn_tr_mgs_ = gcf.mg_scanning(X_rnn_tr_, y_tr)  # scanning
+        gcf = gcForest(shape_1X=32, window=23, tolerance=0.0, min_samples_mgs=20, min_samples_cascade=10)
+        X_rnn_tr_mgs_ = gcf.mg_scanning(X_rnn_tr_, y_tr)  # (1200,24)# scanning
 
-        X_rnn_te_ = X_rnn_te[0]  # (240,32)
+        X_rnn_te_ = X_rnn_te[0]  # (1200,32)
         # X_cnn_te_ = X_cnn_te_.reshape(X_cnn_te.shape[1], 81)  # (240, 9, 9) reshape-->(240,81)
-        X_rnn_te_mgs_ = gcf.mg_scanning(X_rnn_te_)
+        X_rnn_te_mgs_ = gcf.mg_scanning(X_rnn_te_)  # (1200,24)
 
         X_rnn_tr_mgs = X_rnn_tr_mgs_
         X_rnn_te_mgs = X_rnn_te_mgs_
@@ -107,22 +107,26 @@ for data_file in file_list:
         for i in range(1, X_rnn_tr.shape[0]):
             X_rnn_tr_ = X_rnn_tr[i]
             # X_rnn_tr_ = X_rnn_tr_.reshape(X_rnn_tr.shape[1], 81)
-            gcf = gcForest(shape_1X=32, window=4, tolerance=0.0, min_samples_mgs=20, min_samples_cascade=10)
+            gcf = gcForest(shape_1X=32, window=23, tolerance=0.0, min_samples_mgs=20, min_samples_cascade=10)
             X_rnn_tr_mgs_ = gcf.mg_scanning(X_rnn_tr_, y_tr)                    # 模型根据y_tr进行训练
             X_rnn_tr_mgs = np.concatenate((X_rnn_tr_mgs, X_rnn_tr_mgs_), axis=1)    # concatenate
             #print('X_tr_mgs_.shape:', X_tr_mgs_.shape)
             X_rnn_te_ = X_rnn_te[i]
             # X_rnn_te_ = X_rnn_te_.reshape(X_rnn_te.shape[1], 81)
             #print('X_te_mgs_.shape:', X_te_mgs_.shape)
-            X_rnn_te_mgs_ = gcf.mg_scanning(X_rnn_te_)                         # 回调最后训练的随机森林模型
+            X_rnn_te_mgs_ = gcf.mg_scanning(X_rnn_te_)    #(1200,48)                     # 回调最后训练的随机森林模型
             X_rnn_te_mgs = np.concatenate((X_rnn_te_mgs, X_rnn_te_mgs_), axis=1)
-        print('X_tr_mgs.shape:', X_rnn_tr_mgs.shape)
-        print('X_te_mgs.shape:', X_rnn_te_mgs.shape)
+        print('X_rnn_tr_mgs.shape:', X_rnn_tr_mgs.shape)  # (1200, 3072)
+        print('X_rnn_te_mgs.shape:', X_rnn_te_mgs.shape)
 
-        X_cnn_tr_mgs = np.concatenate(X_rnn_tr_mgs)
 
-        _ = gcf.cascade_forest(X_cnn_tr_mgs, y_tr)                        # 使用多粒度扫描的输出作为级联结构的输入，这里要注意
-        pred_proba = np.mean(gcf.cascade_forest(X_cnn_te_mgs), axis=0)    # 级联结构不能直接返回预测，而是最后一层级联Level的结果
+        X_tr_mgs = np.concatenate((X_cnn_tr_mgs,X_rnn_tr_mgs), axis=1)
+        print("X_tr_mgs",X_tr_mgs.shape)
+        X_te_mgs = np.concatenate((X_cnn_te_mgs,X_rnn_te_mgs), axis=1)
+        print("X_tr_mgs", X_te_mgs.shape)
+
+        _ = gcf.cascade_forest(X_tr_mgs, y_tr)                        # 使用多粒度扫描的输出作为级联结构的输入，这里要注意
+        pred_proba = np.mean(gcf.cascade_forest(X_te_mgs), axis=0)    # 级联结构不能直接返回预测，而是最后一层级联Level的结果
         preds = np.argmax(pred_proba, axis=1)                         # 因此，需要求平均并且取做大作为预测值
 
         # test_sample = y_te.shape[0]
