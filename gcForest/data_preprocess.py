@@ -136,15 +136,17 @@ if __name__ == '__main__' :
     dataset_dir		=   "./data_preprocessed_matlab/"
     window_size		=	128
     output_dir		=   "./deap_shuffled_data/"
-    label_class     = 'valence'  # arousal/valence
+    label_class     = 'arousal'  # arousal/valence
     # get directory name for one subject
     record_list = [task for task in os.listdir(dataset_dir) if os.path.isfile(os.path.join(dataset_dir,task))]
+    print("record_list",record_list)
     output_dir = output_dir+label_class+"/"
     if os.path.isdir(output_dir)==False:
         os.makedirs(output_dir)
     # print(record_list)
 
     for record in record_list:
+        print("record",record)
         file = os.path.join(dataset_dir,record)
         shuffled_data_cnn,shuffled_data_rnn,shuffled_label,record = apply_mixup(file, window_size,label_class)  # apply_mixup
         output_data_cnn = output_dir+record+"_cnn_dataset.pkl"
@@ -161,4 +163,4 @@ if __name__ == '__main__' :
         print("end time:",time.localtime())
         print("time consuming:",(end-begin))
 
-        break
+

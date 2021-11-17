@@ -216,10 +216,10 @@ class gcForest(object):
         stride = getattr(self, 'stride')
 
         if shape_1X[0] > 1:
-            print('Slicing Images...')
+            # print('Slicing Images...')
             sliced_X, sliced_y = self._window_slicing_img(X, window, shape_1X, y=y, stride=stride)
         else:
-            print('Slicing Sequence...')
+            # print('Slicing Sequence...')
             sliced_X, sliced_y = self._window_slicing_sequence(X, window, shape_1X, y=y, stride=stride)
 
         if y is not None:
@@ -228,7 +228,7 @@ class gcForest(object):
                                          min_samples_split=min_samples, oob_score=True, n_jobs=n_jobs)
             crf = RandomForestClassifier(n_estimators=n_tree, max_features=1,
                                          min_samples_split=min_samples, oob_score=True, n_jobs=n_jobs)
-            print('Training MGS Random Forests...')
+            # print('Training MGS Random Forests...')
             prf.fit(sliced_X, sliced_y)
             crf.fit(sliced_X, sliced_y)
             setattr(self, '_mgsprf_{}'.format(window), prf)

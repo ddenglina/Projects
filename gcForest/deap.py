@@ -6,13 +6,15 @@ import numpy as np
 import datetime
 import pandas as pd
 import scipy.io as sio
+# import tensorflow as tf
 
 starttime = datetime.datetime.now()
 
-file_list = ["s01"]
-# file_list=['s01','s02','s03','s04','s05','s06','s07','s08','s09','s10','s11','s12','s13','s14','s15','s16','s17','s18','s19','s20','s22', 's23','s24', 's25', 's21', 's26', 's27', 's28', 's29', 's30','s31','s32' ] #
+# file_list = ["s01"]
+file_list=['s02','s03','s04','s05','s06','s07','s08','s09','s10','s11','s12','s13','s14','s15','s16','s17','s18','s19','s20','s22', 's23','s24', 's25', 's21', 's26', 's27', 's28', 's29', 's30','s31','s32' ] #
 test_accuracy_all_sub=np.zeros(shape=[0],dtype=float)
 mean_accuracy_all=0
+
 for data_file in file_list:
     # 读文件数据
     print('sub:', data_file) # ‘s01’
@@ -62,6 +64,7 @@ for data_file in file_list:
         X_cnn_tr = X_cnn_tr.transpose(1, 0, 2, 3) # (128,2160,9,9)
         X_cnn_te = X_cnn_te.transpose(1, 0, 2, 3) # (128,240,9,9)
 
+        print("Slicing Images...")
         X_cnn_tr_ = X_cnn_tr[0] # 初始化：第一个128的数据 (2160, 9, 9)
         X_cnn_tr_ = X_cnn_tr_.reshape(X_cnn_tr.shape[1], 81) # (2160, 9, 9) reshape-->(2160,81)
         gcf = gcForest(shape_1X=[9, 9], window=6, tolerance=0.0, min_samples_mgs=20, min_samples_cascade=10)
@@ -92,6 +95,7 @@ for data_file in file_list:
         X_rnn_tr = X_rnn_tr.transpose(1, 0, 2)  # (128,1200,32)
         X_rnn_te = X_rnn_te.transpose(1, 0, 2)  # (128,1200,32)
 
+        print("Slicing Sequence...")
         X_rnn_tr_ = X_rnn_tr[0]  # 初始化：第一个(1200, 32)数据
         # X_cnn_tr_ = X_cnn_tr_.reshape(X_cnn_tr.shape[1], 81)  # (2160, 9, 9) reshape-->(2160,81)
         gcf = gcForest(shape_1X=32, window=23, tolerance=0.0, min_samples_mgs=20, min_samples_cascade=10)
@@ -125,6 +129,7 @@ for data_file in file_list:
         X_te_mgs = np.concatenate((X_cnn_te_mgs,X_rnn_te_mgs), axis=1)
         print("X_tr_mgs", X_te_mgs.shape)
 
+        print("Training MGS Random Forests...")
         _ = gcf.cascade_forest(X_tr_mgs, y_tr)                        # 使用多粒度扫描的输出作为级联结构的输入，这里要注意
         pred_proba = np.mean(gcf.cascade_forest(X_te_mgs), axis=0)    # 级联结构不能直接返回预测，而是最后一层级联Level的结果
         preds = np.argmax(pred_proba, axis=1)                         # 因此，需要求平均并且取做大作为预测值
@@ -144,14 +149,14 @@ for data_file in file_list:
           "./result/DEAP/" + arousal_or_valence + "/" + data_file  + ".xlsx")
     summary.to_excel(writer, 'summary', index=False)
     writer.save()
-    mean_accuracy_all += mean_accuracy / fold
-    test_accuracy_all_sub = np.append(test_accuracy_all_sub, mean_accuracy / fold)
-
-print('mean_accuracy_all:', mean_accuracy_all / 32)
-result = pd.DataFrame({'sub': range(1, 33), 'test_accuracy': test_accuracy_all_sub})
-writer = pd.ExcelWriter("./result/DEAP/" + arousal_or_valence + ".xlsx")
-result.to_excel(writer, 'result', index=False)
-writer.save()
+#     mean_accuracy_all += mean_accuracy / fold
+#     test_accuracy_all_sub = np.append(test_accuracy_all_sub, mean_accuracy / fold)
+#
+# print('mean_accuracy_all:', mean_accuracy_all / 32)
+# result = pd.DataFrame({'sub': range(1, 33), 'test_accuracy': test_accuracy_all_sub})
+# writer = pd.ExcelWriter("./result/DEAP/" + arousal_or_valence + ".xlsx")
+# result.to_excel(writer, 'result', index=False)
+# writer.save()
 
 endtime = datetime.datetime.now()
 print(endtime - starttime)
